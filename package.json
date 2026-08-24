@@ -1,0 +1,20 @@
+{
+  "name": "pi-task-delivery",
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Keep Pi repository work aligned with current project specifications and delivery rules.",
+  "keywords": [
+    "pi-package"
+  ],
+  "pi": {
+    "extensions": [
+      "./extensions/index.ts"
+    ],
+    "skills": [
+      "./skills"
+    ]
+  },
+  "peerDependencies": {
+    "@earendil-works/pi-coding-agent": "*"
+  }
+}
