@@ -1,59 +1,22 @@
-import { constants } from "node:fs";
-import { copyFile, mkdir, readdir } from "node:fs/promises";
-import { dirname, join } from "node:path";
-import { fileURLToPath } from "node:url";
 import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
 
-const extensionDir = dirname(fileURLToPath(import.meta.url));
-const templatesDir = join(extensionDir, "templates");
-const skillsDir = join(extensionDir, "skills");
-const documentNames = ["SPEC.md", "CHECKLIST.md", "DEBUGLOG.md", "CHECKLOG.md"];
+const taskDeliveryInstructions = `## Task Delivery
 
-async function findGitRoot(pi: ExtensionAPI, cwd: string): Promise<string | undefined> {
-  const result = await pi.exec("git", ["-C", cwd, "rev-parse", "--show-toplevel"], {
-    timeout: 3000,
-  });
-  if (result.code !== 0) return undefined;
-  return result.stdout.trim() || undefined;
-}
+1. Understand the user's intent and keep the work within that scope.
+2. For repository work, follow \`docs/SPEC.md\` and \`docs/CHECKLIST.md\`. Create missing task-delivery documents: \`docs/SPEC.md\`, \`docs/CHECKLIST.md\`, \`docs/DEBUGLOG.md\`, and \`docs/CHECKLOG.md\`.
+3. Make the smallest direct change that completes the task.
+4. Record real debugging work in \`docs/DEBUGLOG.md\` and real checking findings and fixes in \`docs/CHECKLOG.md\`.
 
-async function isBlankRepository(root: string): Promise<boolean> {
-  const entries = await readdir(root);
-  return entries.every((entry) => entry === ".git" || entry === ".gitignore");
-}
+- Only the user may edit \`docs/SPEC.md\` and \`docs/CHECKLIST.md\`.
+- Follow file placement and naming rules from the project documentation.
+- Do not over-engineer or expand a local change into a broad redesign.
+- Do not create useless test files or run unrelated full-scale validation.
+- Keep commits small and independent. Pull before committing, resolve conflicts, then commit and push according to the user's instructions.
 
-async function initializeDocuments(root: string): Promise<string[]> {
-  const docsDir = join(root, "docs");
-  await mkdir(docsDir, { recursive: true });
-
-  const created: string[] = [];
-  for (const name of documentNames) {
-    try {
-      await copyFile(join(templatesDir, name), join(docsDir, name), constants.COPYFILE_EXCL);
-      created.push(`docs/${name}`);
-    } catch (error) {
-      if ((error as NodeJS.ErrnoException).code !== "EEXIST") throw error;
-    }
-  }
-  return created;
-}
+Task-level training and development checks are outside the current scope.`;
 
 export default function taskDelivery(pi: ExtensionAPI) {
-  pi.on("resources_discover", async () => ({ skillPaths: [skillsDir] }));
-
-  pi.on("session_start", async (_event, ctx) => {
-    if (!ctx.isProjectTrusted()) return;
-
-    const root = await findGitRoot(pi, ctx.cwd);
-    if (!root || !(await isBlankRepository(root))) return;
-
-    const created = await initializeDocuments(root);
-    if (created.length > 0 && ctx.hasUI) {
-      ctx.ui.notify(`Task delivery initialized: ${created.join(", ")}`, "info");
-    }
-  });
-
-  pi.on("before_agent_start", async (event) => ({
-    systemPrompt: `${event.systemPrompt}\n\n## Task Delivery\n\nFollow the task-delivery skill. Before repository work, read the current docs/SPEC.md and docs/CHECKLIST.md when present. Only the user may edit these two files.`,
+  pi.on("before_agent_start", (event) => ({
+    systemPrompt: `${event.systemPrompt}\n\n${taskDeliveryInstructions}`,
   }));
 }
