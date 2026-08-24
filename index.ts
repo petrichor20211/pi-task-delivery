@@ -5,7 +5,8 @@ import { fileURLToPath } from "node:url";
 import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
 
 const extensionDir = dirname(fileURLToPath(import.meta.url));
-const templatesDir = join(extensionDir, "..", "templates");
+const templatesDir = join(extensionDir, "templates");
+const skillsDir = join(extensionDir, "skills");
 const documentNames = ["SPEC.md", "CHECKLIST.md", "DEBUGLOG.md", "CHECKLOG.md"];
 
 async function findGitRoot(pi: ExtensionAPI, cwd: string): Promise<string | undefined> {
@@ -38,6 +39,8 @@ async function initializeDocuments(root: string): Promise<string[]> {
 }
 
 export default function taskDelivery(pi: ExtensionAPI) {
+  pi.on("resources_discover", async () => ({ skillPaths: [skillsDir] }));
+
   pi.on("session_start", async (_event, ctx) => {
     if (!ctx.isProjectTrusted()) return;
 

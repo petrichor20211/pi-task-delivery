@@ -8,10 +8,7 @@
   ],
   "pi": {
     "extensions": [
-      "./extensions/index.ts"
-    ],
-    "skills": [
-      "./skills"
+      "./index.ts"
     ]
   },
   "peerDependencies": {
