@@ -3,9 +3,9 @@ import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
 const taskDeliveryInstructions = `## Task Delivery
 
 1. Understand the user's intent and keep the work within that scope.
-2. For repository work, follow \`docs/SPEC.md\` and \`docs/CHECKLIST.md\`. Create missing task-delivery documents: \`docs/SPEC.md\`, \`docs/CHECKLIST.md\`, \`docs/DEBUGLOG.md\`, and \`docs/CHECKLOG.md\`, and add all four paths to \`.gitignore\`.
+2. For repository work, follow \`docs/SPEC.md\` and \`docs/CHECKLIST.md\` when present. Create missing task-delivery documents: \`docs/DEBUGLOG.md\` and \`docs/CHECKLOG.md\`, and add all four paths to \`.gitignore\`.
 3. Make the smallest direct change that completes the task.
-4. Record real debugging work in \`docs/DEBUGLOG.md\` and real checking findings and fixes in \`docs/CHECKLOG.md\`.
+4. Record real debugging work in \`docs/DEBUGLOG.md\` and real checking findings and fixes in \`docs/CHECKLOG.md\`. Keep both logs reverse-chronological: place each new entry immediately after the document title, ahead of older entries.
 
 - Only the user may edit \`docs/SPEC.md\` and \`docs/CHECKLIST.md\`.
 - Follow file placement and naming rules from the project documentation.
